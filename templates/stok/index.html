@@ -1,0 +1,195 @@
+{% extends "layout.html" %}
+{% set active_page = "stok" %}
+{% block title %}Stok Gudang — Gudang V1{% endblock %}
+{% block page_title %}Stok Gudang{% endblock %}
+{% block page_subtitle %}Pencatatan dan manajemen stok barang{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="alert-error">
+  <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20" style="flex-shrink:0;">
+    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+  </svg>
+  {{ error }}
+</div>
+{% endif %}
+
+<!-- Summary mini cards -->
+{% if summary %}
+<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+  {% for row in summary %}
+  <div class="card-sm" style="min-width:160px;flex:1;">
+    <p style="font-size:11.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;">
+      {{ row.nama_barang }}
+    </p>
+    <div style="display:flex;align-items:baseline;gap:5px;">
+      <span style="font-size:20px;font-weight:700;color:{% if row.total_stok > 0 %}#4f46e5{% else %}#d1d5db{% endif %};">
+        {{ row.total_stok | int if row.total_stok == (row.total_stok | int) else row.total_stok }}
+      </span>
+      <span style="font-size:11.5px;color:#9ca3af;">{{ row.nama_satuan or '' }}</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Main grid -->
+<div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start;">
+
+  <!-- Form Catat Stok -->
+  <div class="card">
+    <h2 style="font-size:13.5px;font-weight:600;color:#111827;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f3f4f6;">
+      Catat Stok Baru
+    </h2>
+    <form method="POST" action="/stok/add">
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">
+          Barang <span style="color:#ef4444;">*</span>
+        </label>
+        <select name="idbarang" required class="form-control">
+          <option value="">— Pilih Barang —</option>
+          {% for b in barang_list %}
+          <option value="{{ b.id }}">{{ b.nama }}{% if b.nama_satuan %} ({{ b.nama_satuan }}){% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">
+          Jumlah <span style="color:#ef4444;">*</span>
+        </label>
+        <input type="number" name="jumlah" step="0.01" min="0" required
+               placeholder="0" class="form-control" />
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">
+          Tanggal &amp; Waktu <span style="color:#ef4444;">*</span>
+        </label>
+        <input type="datetime-local" name="datetime" id="inp-stok-dt" required class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Catat Stok
+      </button>
+    </form>
+  </div>
+
+  <!-- Tabel Riwayat Stok -->
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div style="padding:14px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h2 style="font-size:13.5px;font-weight:600;color:#111827;">Riwayat Stok</h2>
+        <p style="font-size:11.5px;color:#9ca3af;margin-top:2px;">Semua transaksi stok tercatat</p>
+      </div>
+      <span style="font-size:11.5px;color:#9ca3af;background:#f9fafb;border:1px solid #e5e7eb;padding:3px 10px;border-radius:99px;">
+        {{ items|length }} entri
+      </span>
+    </div>
+
+    {% if items %}
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th>Barang</th>
+            <th style="text-align:right;">Jumlah</th>
+            <th>Tanggal &amp; Waktu</th>
+            <th style="text-align:right;width:160px;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td style="color:#9ca3af;font-size:12px;">{{ loop.index }}</td>
+            <td>
+              <p style="font-weight:600;color:#111827;font-size:13.5px;">{{ item.nama_barang }}</p>
+              <p style="font-size:11.5px;color:#9ca3af;margin-top:1px;">{{ item.nama_satuan or '—' }}</p>
+            </td>
+            <td style="text-align:right;">
+              <span style="font-size:16px;font-weight:700;color:#4f46e5;">
+                {{ item.jumlah | int if item.jumlah == (item.jumlah | int) else item.jumlah }}
+              </span>
+            </td>
+            <td>
+              <span style="font-size:12.5px;color:#374151;background:#f9fafb;padding:3px 8px;border-radius:6px;border:1px solid #e5e7eb;white-space:nowrap;">
+                {{ item.datetime | replace('T', ' ') }}
+              </span>
+            </td>
+            <td style="text-align:right;">
+              <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                <button class="btn btn-edit"
+                  onclick="openEditStok({{ item.id }}, {{ item.idbarang }}, {{ item.jumlah }}, '{{ item.datetime }}')">
+                  Edit
+                </button>
+                <form method="POST" action="/stok/delete" onsubmit="return confirm('Hapus entri stok ini?')" style="display:inline;">
+                  <input type="hidden" name="id" value="{{ item.id }}" />
+                  <button type="submit" class="btn btn-danger">Hapus</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:56px 24px;color:#9ca3af;">
+      <svg width="40" height="40" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 12px;">
+        <path stroke-linecap="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
+      </svg>
+      <p style="font-size:13.5px;">Belum ada entri stok.</p>
+      <p style="font-size:12px;margin-top:4px;">Gunakan form di kiri untuk mencatat stok pertama.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Auto-fill datetime ke waktu sekarang
+  const dtInput = document.getElementById('inp-stok-dt');
+  if (dtInput) {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    dtInput.value = now.toISOString().slice(0, 16);
+  }
+
+  const barangList  = {{ barang_list | map(attribute='id')          | list | tojson }};
+  const barangNames = {{ barang_list | map(attribute='nama')         | list | tojson }};
+  const barangSat   = {{ barang_list | map(attribute='nama_satuan')  | list | tojson }};
+
+  function openEditStok(id, idbarang, jumlah, datetime) {
+    let opts = '<option value="">— Pilih Barang —</option>';
+    barangList.forEach((bid, i) => {
+      const sat = barangSat[i] ? ` (${barangSat[i]})` : '';
+      opts += `<option value="${bid}" ${bid == idbarang ? 'selected' : ''}>${barangNames[i]}${sat}</option>`;
+    });
+    const dtFormatted = datetime.replace(' ', 'T').slice(0, 16);
+
+    openModal('Edit Stok', `
+      <form method="POST" action="/stok/edit">
+        <input type="hidden" name="id" value="${id}" />
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">Barang</label>
+          <select name="idbarang" required class="form-control">${opts}</select>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">Jumlah</label>
+          <input type="number" name="jumlah" value="${jumlah}" step="0.01" min="0" required class="form-control" />
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">Tanggal &amp; Waktu</label>
+          <input type="datetime-local" name="datetime" value="${dtFormatted}" required class="form-control" />
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">Simpan</button>
+          <button type="button" onclick="closeModal()" class="btn btn-outline" style="flex:1;justify-content:center;">Batal</button>
+        </div>
+      </form>
+    `);
+  }
+</script>
+{% endblock %}

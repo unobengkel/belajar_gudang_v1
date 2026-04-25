@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+{% set active_page = "jenis" %}
+{% block title %}Jenis Barang — Gudang V1{% endblock %}
+{% block page_title %}Jenis Barang{% endblock %}
+{% block page_subtitle %}Kelola kategori / jenis barang{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="alert-error">
+  <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20" style="flex-shrink:0;">
+    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+  </svg>
+  {{ error }}
+</div>
+{% endif %}
+
+<div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start;">
+
+  <!-- Form Tambah -->
+  <div class="card">
+    <h2 style="font-size:13.5px;font-weight:600;color:#111827;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f3f4f6;">
+      Tambah Jenis Baru
+    </h2>
+    <form method="POST" action="/jenis/add">
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">
+          Nama Jenis <span style="color:#ef4444;">*</span>
+        </label>
+        <input id="inp-jenis-nama" type="text" name="nama" required
+               placeholder="Contoh: Elektronik"
+               class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Simpan
+      </button>
+    </form>
+  </div>
+
+  <!-- Table -->
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div style="padding:14px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
+      <h2 style="font-size:13.5px;font-weight:600;color:#111827;">Daftar Jenis</h2>
+      <span style="font-size:11.5px;color:#9ca3af;background:#f9fafb;border:1px solid #e5e7eb;padding:3px 10px;border-radius:99px;">
+        {{ items|length }} data
+      </span>
+    </div>
+    {% if items %}
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th style="width:44px;">#</th>
+            <th>Nama Jenis</th>
+            <th style="text-align:right;width:160px;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td style="color:#9ca3af;font-size:12px;">{{ loop.index }}</td>
+            <td style="font-weight:500;color:#111827;">{{ item.nama }}</td>
+            <td style="text-align:right;">
+              <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                <button class="btn btn-edit" onclick="openEditJenis({{ item.id }}, '{{ item.nama | e }}')">
+                  Edit
+                </button>
+                <form method="POST" action="/jenis/delete" onsubmit="return confirm('Hapus jenis ini?')" style="display:inline;">
+                  <input type="hidden" name="id" value="{{ item.id }}" />
+                  <button type="submit" class="btn btn-danger">Hapus</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:48px 24px;color:#9ca3af;">
+      <svg width="36" height="36" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 10px;">
+        <path stroke-linecap="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <p style="font-size:13.5px;">Belum ada data jenis.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openEditJenis(id, nama) {
+  openModal('Edit Jenis', `
+    <form method="POST" action="/jenis/edit">
+      <input type="hidden" name="id" value="${id}" />
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">Nama Jenis</label>
+        <input type="text" name="nama" value="${nama}" required class="form-control" />
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">Simpan Perubahan</button>
+        <button type="button" onclick="closeModal()" class="btn btn-outline" style="flex:1;justify-content:center;">Batal</button>
+      </div>
+    </form>
+  `);
+}
+</script>
+{% endblock %}

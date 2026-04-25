@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Penggunaan - Gudang V1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #374151; }
+        .step-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .badge-step { background: #4f46e5; color: white; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; margin-bottom: 12px; display: inline-block; }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+    <div class="max-w-4xl mx-auto">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Panduan Pengguna Gudang V1</h1>
+            <p class="text-lg text-gray-600">Pelajari cara mengoperasikan sistem manajemen stok gudang Anda dengan efektif.</p>
+        </header>
+
+        <section>
+            <!-- Langkah 1 -->
+            <div class="step-card">
+                <span class="badge-step">Langkah 1</span>
+                <h2 class="text-xl font-bold mb-4">Menyiapkan Master Data</h2>
+                <p class="mb-4">Sebelum menambah barang, Anda harus mengisi data pendukung terlebih dahulu di menu <strong>Master Data</strong>:</p>
+                <ul class="list-disc ml-6 space-y-2">
+                    <li><strong>Jenis Barang:</strong> Kategorikan barang (misal: Elektronik, Makanan).</li>
+                    <li><strong>Satuan:</strong> Tentukan unit ukuran (misal: Pcs, Kg, Box).</li>
+                    <li><strong>Merek:</strong> Masukkan brand dari barang tersebut.</li>
+                </ul>
+            </div>
+
+            <!-- Langkah 2 -->
+            <div class="step-card">
+                <span class="badge-step">Langkah 2</span>
+                <h2 class="text-xl font-bold mb-4">Mendaftarkan Barang</h2>
+                <p class="mb-4">Setelah master data siap, buka menu <strong>Barang</strong>:</p>
+                <ol class="list-decimal ml-6 space-y-2">
+                    <li>Klik form "Tambah Barang Baru".</li>
+                    <li>Masukkan nama barang.</li>
+                    <li>Pilih Jenis, Satuan, dan Merek dari dropdown yang tersedia.</li>
+                    <li>Klik <strong>Simpan</strong>.</li>
+                </ol>
+            </div>
+
+            <!-- Langkah 3 -->
+            <div class="step-card">
+                <span class="badge-step">Langkah 3</span>
+                <h2 class="text-xl font-bold mb-4">Mencatat Stok Gudang</h2>
+                <p class="mb-4">Untuk menambah atau mengurangi stok, gunakan menu <strong>Stok Gudang</strong>:</p>
+                <ul class="list-disc ml-6 space-y-2">
+                    <li>Pilih barang yang ingin dicatat stoknya.</li>
+                    <li>Masukkan jumlah (gunakan angka positif).</li>
+                    <li>Atur tanggal dan waktu transaksi.</li>
+                    <li>Klik <strong>Catat Stok</strong>. Riwayat akan muncul di tabel sebelah kanan.</li>
+                </ul>
+            </div>
+
+            <!-- Langkah 4 -->
+            <div class="step-card">
+                <span class="badge-step">Langkah 4</span>
+                <h2 class="text-xl font-bold mb-4">Memantau Dashboard</h2>
+                <p>Dashboard memberikan ringkasan cepat tentang operasional gudang Anda. Anda bisa melihat total jenis, merek, dan barang yang terdaftar, serta tabel ringkasan stok kumulatif untuk memastikan tidak ada barang yang kehabisan stok.</p>
+            </div>
+        </section>
+
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            Gudang V1 Documentation &copy; 2025. Dibuat untuk efisiensi gudang Anda.
+        </footer>
+    </div>
+</body>
+</html>

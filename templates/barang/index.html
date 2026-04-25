@@ -1,0 +1,173 @@
+{% extends "layout.html" %}
+{% set active_page = "barang" %}
+{% block title %}Barang — Gudang V1{% endblock %}
+{% block page_title %}Data Barang{% endblock %}
+{% block page_subtitle %}Kelola daftar barang di gudang{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="alert-error">
+  <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20" style="flex-shrink:0;">
+    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+  </svg>
+  {{ error }}
+</div>
+{% endif %}
+
+<div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start;">
+
+  <!-- Form Tambah -->
+  <div class="card">
+    <h2 style="font-size:13.5px;font-weight:600;color:#111827;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f3f4f6;">
+      Tambah Barang Baru
+    </h2>
+    <form method="POST" action="/barang/add">
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">
+          Nama Barang <span style="color:#ef4444;">*</span>
+        </label>
+        <input id="inp-barang-nama" type="text" name="nama" required
+               placeholder="Nama barang" class="form-control" />
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">Jenis</label>
+        <select name="idjenis" class="form-control">
+          <option value="">— Pilih Jenis —</option>
+          {% for j in jenis_list %}
+          <option value="{{ j.id }}">{{ j.nama }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">Satuan</label>
+        <select name="idsatuan" class="form-control">
+          <option value="">— Pilih Satuan —</option>
+          {% for s in satuan_list %}
+          <option value="{{ s.id }}">{{ s.nama }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">Merek</label>
+        <select name="idmerek" class="form-control">
+          <option value="">— Pilih Merek —</option>
+          {% for m in merek_list %}
+          <option value="{{ m.id }}">{{ m.nama }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Simpan
+      </button>
+    </form>
+  </div>
+
+  <!-- Table -->
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div style="padding:14px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
+      <h2 style="font-size:13.5px;font-weight:600;color:#111827;">Daftar Barang</h2>
+      <span style="font-size:11.5px;color:#9ca3af;background:#f9fafb;border:1px solid #e5e7eb;padding:3px 10px;border-radius:99px;">
+        {{ items|length }} data
+      </span>
+    </div>
+    {% if items %}
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th>Nama Barang</th>
+            <th>Jenis</th>
+            <th>Satuan</th>
+            <th>Merek</th>
+            <th style="text-align:right;width:160px;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td style="color:#9ca3af;font-size:12px;">{{ loop.index }}</td>
+            <td style="font-weight:600;color:#111827;">{{ item.nama }}</td>
+            <td>
+              {% if item.nama_jenis %}
+                <span class="badge badge-blue">{{ item.nama_jenis }}</span>
+              {% else %}
+                <span style="color:#d1d5db;">—</span>
+              {% endif %}
+            </td>
+            <td style="color:#6b7280;font-size:13px;">{{ item.nama_satuan or '—' }}</td>
+            <td style="color:#6b7280;font-size:13px;">{{ item.nama_merek or '—' }}</td>
+            <td style="text-align:right;">
+              <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                <button class="btn btn-edit"
+                  onclick="openEditBarang({{ item.id }}, '{{ item.nama | e }}', {{ item.idjenis or 0 }}, {{ item.idsatuan or 0 }}, {{ item.idmerek or 0 }})">
+                  Edit
+                </button>
+                <form method="POST" action="/barang/delete" onsubmit="return confirm('Hapus barang ini?')" style="display:inline;">
+                  <input type="hidden" name="id" value="{{ item.id }}" />
+                  <button type="submit" class="btn btn-danger">Hapus</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:56px 24px;color:#9ca3af;">
+      <svg width="40" height="40" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 12px;">
+        <path stroke-linecap="round" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+      </svg>
+      <p style="font-size:13.5px;">Belum ada data barang.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const jenisList   = {{ jenis_list  | map(attribute='id')   | list | tojson }};
+  const jenisNames  = {{ jenis_list  | map(attribute='nama')  | list | tojson }};
+  const satuanList  = {{ satuan_list | map(attribute='id')   | list | tojson }};
+  const satuanNames = {{ satuan_list | map(attribute='nama')  | list | tojson }};
+  const merekList   = {{ merek_list  | map(attribute='id')   | list | tojson }};
+  const merekNames  = {{ merek_list  | map(attribute='nama')  | list | tojson }};
+
+  function buildSelect(name, ids, names, selectedId) {
+    let opts = `<option value="">— Pilih —</option>`;
+    ids.forEach((id, i) => {
+      opts += `<option value="${id}" ${id == selectedId ? 'selected' : ''}>${names[i]}</option>`;
+    });
+    return `<select name="${name}" class="form-control" style="margin-bottom:0;">${opts}</select>`;
+  }
+
+  function fieldRow(label, content) {
+    return `
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:6px;">${label}</label>
+        ${content}
+      </div>`;
+  }
+
+  function openEditBarang(id, nama, idjenis, idsatuan, idmerek) {
+    openModal('Edit Barang', `
+      <form method="POST" action="/barang/edit">
+        <input type="hidden" name="id" value="${id}" />
+        ${fieldRow('Nama Barang', `<input type="text" name="nama" value="${nama}" required class="form-control" />`)}
+        ${fieldRow('Jenis', buildSelect('idjenis', jenisList, jenisNames, idjenis))}
+        ${fieldRow('Satuan', buildSelect('idsatuan', satuanList, satuanNames, idsatuan))}
+        ${fieldRow('Merek', buildSelect('idmerek', merekList, merekNames, idmerek))}
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">Simpan</button>
+          <button type="button" onclick="closeModal()" class="btn btn-outline" style="flex:1;justify-content:center;">Batal</button>
+        </div>
+      </form>
+    `);
+  }
+</script>
+{% endblock %}
